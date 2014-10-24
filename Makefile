@@ -33,7 +33,9 @@ INCLUDE_PATHS = $(abspath $(dir $(THIS_MAKEFILE)))
 
 # Project Build flags
 WARNINGS := -Wno-variadic-macros -Wno-long-long -Wall -pedantic -Werror
-CXXFLAGS := -I$(NACL_SDK_ROOT)/include -pthread -std=gnu++98 $(WARNINGS)
+CXXFLAGS := -pthread -std=gnu++98 $(WARNINGS) \
+						-I$(NACL_SDK_ROOT)/include \
+						-L$(NACL_SDK_ROOT)/lib/newlib_x86_64/Release
 
 #
 # Compute tool paths
