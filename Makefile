@@ -75,3 +75,7 @@ $(PROJECT)_x86_64.nexe : $(x86_64_OBJS)
 .PHONY: RUN
 RUN: all
 	python httpd.py
+
+clean:
+	rm $(x86_32_OBJS)
+	rm $(x86_64_OBJS)
