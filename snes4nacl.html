@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+  <title>snes4nacl</title>
+
+  <script type="text/javascript">
+    snes4nacl = null;  // Global application object.
+    statusText = 'NO-STATUS';
+	
+	document.onkeydown = function(evt) { 
+		return keyEvent('down', evt); 
+	};
+	
+	document.onkeyup = function(evt) { 
+		return keyEvent('up', evt);
+	};
+	
+	function onFileSelect(evt) {
+		var rom_url = window.webkitURL.createObjectURL(evt.target.files[0]);
+		console.log('Incoming file: ' + evt.target.files[0].name + ' ' + rom_url);
+		snes4nacl.postMessage('downloadThenLoadRom url:' + rom_url);
+	}
+
+    function moduleDidLoad() {
+      snes4nacl = document.getElementById('snes4nacl');
+	  snes4nacl.postMessage('init');
+    }
+	
+	//for now, static key mappings
+	var controls = {
+	  '38': 'J1_UP',
+	  '40': 'J1_DOWN',
+	  '37': 'J1_LEFT',
+	  '39': 'J1_RIGHT',
+	  '13': 'J1_START',
+	  '9': 'J1_SELECT',
+
+	  'Z': 'J1_A',
+	  'X': 'J1_B',
+	  'A': 'J1_X',
+	  'S': 'J1_Y',
+	  'Q': 'J1_L',
+	  'W': 'J1_R',
+	};
+	var currentControlState = {};
+	
+	function keyEvent(direction, event) {
+		var character = String.fromCharCode(event.keyCode);
+		if( currentControlState[character] == event)
+			return false;
+		currentControlState[character] = event;
+		if(controls[character] !== undefined) 
+			snes4nacl.postMessage('keyEvent c:' + controls[character] + ' d:' + direction);
+		else if(controls[event.keyCode] !== undefined)
+			snes4nacl.postMessage('keyEvent c:' + controls[event.keyCode] + ' d:' + direction);
+		else
+			return true;
+		return false;
+	}
+	
+	function initFinished() {
+		updateStatus('SUCCESS! SNES ROM file: <input type=\"file\" id=\"romfile\"/> <a href=\"#\" onclick=\"scale(\'1\')\">1x</a> | <a href=\"#\" onclick=\"scale(\'2\')\">2x</a> | <a href=\"#\" onclick=\"scale(\'4\')\">4x</a> <input id=\"ssCheck\" type=\"checkbox\" checked=\"1\" onclick=\"smoothScale()\">Smooth scaling</input>');
+		document.getElementById('romfile').addEventListener('change', onFileSelect, false);
+	}
+	
+	function scale(amount) {
+		document.getElementById('snes4nacl').width = 256 * amount;
+		document.getElementById('snes4nacl').height = 224 * amount;
+	}
+	
+	function smoothScale() {
+		if(document.getElementById('ssCheck').checked)
+			snes4nacl.postMessage('setSmoothScale arg:1');
+		else
+			snes4nacl.postMessage('setSmoothScale arg:0');
+	}
+	
+	function loadFinished() {
+	
+		window.requestAnimFrame = (function(callback){
+			return window.requestAnimationFrame ||
+			window.webkitRequestAnimationFrame ||
+			window.mozRequestAnimationFrame ||
+			window.oRequestAnimationFrame ||
+			window.msRequestAnimationFrame ||
+			function(callback){
+				window.setTimeout(callback, 1000 / 60);
+			};
+		})();
+		snes4nacl.postMessage('play');
+		mainLoop(new Date().getTime());
+	}
+	
+	function mainLoop(lastDrawTime) {
+		var now = new Date().getTime();
+		snes4nacl.postMessage('frame');
+		requestAnimFrame( function() { mainLoop(now) } );
+	}
+
+    function handleMessage(message_event) {
+		var isMsg = false;
+		if( message_event.data.length > 4 ) {
+			if(message_event.data.substr(0,4) == 'msg:')
+				isMsg = true;
+		}
+		if(isMsg == true)
+			console.log('snes4nacl: ' + message_event.data.substr(4));
+		else if(message_event.data == 'initFinished')
+			initFinished();
+		else if(message_event.data == 'loadFinished')
+			loadFinished();
+    }
+
+    function pageDidLoad() {
+      if (snes4nacl == null) {
+        updateStatus('LOADING...');
+      } else {
+        updateStatus();
+      }
+    }
+	
+    function updateStatus(opt_message) {
+      if (opt_message)
+        statusText = opt_message;
+      var statusField = document.getElementById('status_field');
+      if (statusField) {
+        statusField.innerHTML = statusText;
+      }
+    }
+  </script>
+  <style type="text/css">
+  </style>
+</head>
+<body onload="pageDidLoad()">
+
+<h1>snes4nacl</h1>
+<div id="status_field">NO-STATUS</div>
+<p>
+  <center>
+  <div id="listener" >
+    <script type="text/javascript">
+      var listener = document.getElementById('listener');
+      listener.addEventListener('load', moduleDidLoad, true);
+      listener.addEventListener('message', handleMessage, true);
+    </script>
+    <embed name="nacl_module" tabindex="0"
+       id="snes4nacl"
+       width=512 height=448
+       src="snes4nacl.nmf"
+       type="application/x-nacl" />
+  </div>
+  </center>
+</p>
+</body>
+</html>
