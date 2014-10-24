@@ -82,3 +82,6 @@ RUN: all
 clean:
 	@rm -f $(x86_32_OBJS)
 	@rm -f $(x86_64_OBJS)
+
+serve:
+	python -m SimpleHTTPServer 8080
