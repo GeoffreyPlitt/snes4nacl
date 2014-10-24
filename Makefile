@@ -3,7 +3,7 @@
 # Project information
 #
 # These variables store project specific settings for the project name
-# build flags, files to copy or install.  In the examples it is typically
+# build flags, files to copy or install. ï¿½In the examples it is typically
 # only the list of sources and project name that will actually change and
 # the rest of the makefile is boilerplate for defining build rules.
 #
@@ -21,7 +21,7 @@ CXX_SOURCES := 	bsx.cpp c4.cpp c4emu.cpp cheats.cpp cheats2.cpp clip.cpp conffil
 				nacl/nacl_module.cpp nacl/Snes9xFuncs.cpp nacl/Instance.cpp \
 				nacl/Emulator.cpp nacl/Graphics.cpp nacl/OpenGL.cpp nacl/URLDownloader.cpp \
 				nacl/FS.cpp nacl/scripting_bridge.cpp nacl/Sound.cpp nacl/Input.cpp
-				
+
 #
 # Get pepper directory for toolchain and includes.
 #
@@ -33,7 +33,7 @@ INCLUDE_PATHS = $(abspath $(dir $(THIS_MAKEFILE)))
 
 # Project Build flags
 WARNINGS := -Wno-variadic-macros -Wno-long-long -Wall -pedantic -Werror
-CXXFLAGS := -pthread -std=gnu++98 $(WARNINGS)
+CXXFLAGS := -I$(NACL_SDK_ROOT)/include -pthread -std=gnu++98 $(WARNINGS)
 
 #
 # Compute tool paths
@@ -70,6 +70,6 @@ $(PROJECT)_x86_64.nexe : $(x86_64_OBJS)
 
 
 # Define a phony rule so it always runs, to build nexe and start up server.
-.PHONY: RUN 
+.PHONY: RUN
 RUN: all
 	python httpd.py

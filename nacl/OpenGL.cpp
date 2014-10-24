@@ -1,14 +1,14 @@
 /**
  *  snes4nacl
  *  (c) 2012 Jeffrey Quesnelle <jquesnelle@gmail.com>
- *  This code is licensed under GPLv3, see LICENSE 
+ *  This code is licensed under GPLv3, see LICENSE
  */
- 
+
 #include "OpenGL.h"
 #include "Instance.h"
 #include "ppapi/cpp/completion_callback.h"
 #include "ppapi/gles2/gl2ext_ppapi.h"
-#include "gles2/gl2.h"
+#include "GLES2/gl2.h"
 
 namespace snes4nacl {
 
@@ -25,7 +25,7 @@ const char* OpenGL::sVertexSource =
 "}														\n";
 
 //Directly samples the emulator pixels from the linearly interpolated coordinates
-const char* OpenGL::sFragmentSource = 
+const char* OpenGL::sFragmentSource =
 "precision mediump float;								\n"
 "varying vec2 tex_coord_final;							\n"
 "uniform sampler2D texture;								\n"
@@ -34,7 +34,7 @@ const char* OpenGL::sFragmentSource =
 "	gl_FragColor = texture2D(texture, tex_coord_final);	\n"
 "}														\n";
 
-OpenGL::OpenGL() : pp::Graphics3DClient(Instance::get()) 
+OpenGL::OpenGL() : pp::Graphics3DClient(Instance::get())
 {
 	shaderProgram = texture = 0;
 	vertexPos_var = textureCoord_var = texture_var = projection_var = -1;
@@ -57,7 +57,7 @@ void OpenGL::size(int width, int height)
 		int32_t ret = context.ResizeBuffers(width, height);
 		printf("OpenGL::size() -- Graphics3D::ResizeBuffers() returned %d", ret);
 	}
-	
+
 }
 
 bool OpenGL::start()
@@ -70,7 +70,7 @@ bool OpenGL::start()
 			PP_GRAPHICS3DATTRIB_NONE
 		};
 		context = pp::Graphics3D(Instance::get(), pp::Graphics3D(), attribs);
-		if (context.is_null()) 
+		if (context.is_null())
 		{
 			glSetCurrentContextPPAPI(0);
 			printf("OpenGL::start() -- Unable to create OpenGL context");
@@ -186,76 +186,76 @@ bool OpenGL::setupScene(GLuint pixelFormat, GLuint pixelType, int maxSource)
 	if(!shaderProgram)
 		return false;
 	printf("OpenGL::setupScene() -- Shaders compiled");
-	
+
 	vertexPos_var = glGetAttribLocation(shaderProgram, "vert_pos");
 	textureCoord_var = glGetAttribLocation(shaderProgram, "tex_coord_in");
 	projection_var = glGetUniformLocation(shaderProgram, "projection");
 	texture_var = glGetUniformLocation(shaderProgram, "texture");
-	
+
 	this->pixelFormat = pixelFormat;
 	this->pixelType = pixelType;
 	trueTextureSize = maxSource;
 	glActiveTexture(GL_TEXTURE0);
     glGenTextures(1, &texture);
     glBindTexture(GL_TEXTURE_2D, texture);
-	
+
 	glPixelStorei(GL_PACK_ALIGNMENT, 1);
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-	
+
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	applySmoothScale();
-	
+
 	glTexImage2D(GL_TEXTURE_2D, 0, pixelFormat, trueTextureSize, trueTextureSize, 0, pixelFormat, pixelType, NULL);
-	
+
 	glDisable(GL_DEPTH_TEST);
 	sceneCreated = true;
-	
+
 	setupViewport();
-	
+
 	return true;
 }
 
 void OpenGL::setupViewport()
 {
 	glViewport(0, 0, width, height);
-	
+
 	//top left
 	verticies[0] = 0;
 	verticies[1] = height;
 	verticies[2] = 0;
-	
+
 	//top right
 	verticies[3] = width;
 	verticies[4] = height;
 	verticies[5] = 0;
-	
+
 	//bottom left
 	verticies[6] = 0;
 	verticies[7] = 0;
 	verticies[8] = 0;
-	
+
 	//bottom right
 	verticies[9] = width;
 	verticies[10] = 0;
 	verticies[11] = 0;
-	
+
 	//transform to screen space
 	matrix[0] = 2.0f / width;
 	matrix[1] = 0;
 	matrix[2] = 0;
 	matrix[3] = 0;
-	
+
 	matrix[4] = 0;
 	matrix[5] = 2.0f / -height;
 	matrix[6] = 0;
 	matrix[7] = 0;
-	
+
 	matrix[8] = 0;
 	matrix[9] = 0 ;
 	matrix[10] = -2.0f;
 	matrix[11] = 0;
-	
+
 	matrix[12] = -1;
 	matrix[13] = 1;
 	matrix[14] = -1;
@@ -268,19 +268,19 @@ void OpenGL::setupSource(int _sourceWidth, int _sourceHeight)
 	sourceHeight = _sourceHeight;
 	float normalX = (float)sourceWidth / (float)trueTextureSize;
 	float normalY = (float)sourceHeight / (float)trueTextureSize;
-	
+
 	textureCoords[0] = 0;
 	textureCoords[1] = normalY;
-	
+
 	textureCoords[2] = normalX;
 	textureCoords[3] = normalY;
-	
+
 	textureCoords[4] = 0;
 	textureCoords[5] = 0;
-	
+
 	textureCoords[6] = normalX;
 	textureCoords[7] = 0;
-	
+
 }
 
 void OpenGL::setSourceData(const unsigned char* data)
@@ -290,7 +290,7 @@ void OpenGL::setSourceData(const unsigned char* data)
 
 	glPixelStorei(GL_PACK_ALIGNMENT, 1);
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-	
+
 	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, sourceWidth, sourceHeight, pixelFormat, pixelType, data);
 }
 
@@ -303,15 +303,15 @@ void OpenGL::draw()
 	glVertexAttribPointer(textureCoord_var, 2, GL_FLOAT, GL_FALSE, 0, textureCoords);
 	glEnableVertexAttribArray(vertexPos_var);
 	glEnableVertexAttribArray(textureCoord_var);
-	
+
 	//activate the actual source texture
 	glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texture);
 	glUniform1i(texture_var, 0);
-	
+
 	//load the projection matrix
 	glUniformMatrix4fv(projection_var, 1, GL_FALSE, matrix);
-	
+
 	//actually draw :)
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 }

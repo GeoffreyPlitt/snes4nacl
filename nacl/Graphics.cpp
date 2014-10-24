@@ -1,11 +1,11 @@
 /**
  *  snes4nacl
  *  (c) 2012 Jeffrey Quesnelle <jquesnelle@gmail.com>
- *  This code is licensed under GPLv3, see LICENSE 
+ *  This code is licensed under GPLv3, see LICENSE
  */
- 
+
 #include "Graphics.h"
-#include "gles2/gl2.h"
+#include "GLES2/gl2.h"
 #include "snes9x.h"
 #include "display.h"
 #include "apu/apu.h"
@@ -13,7 +13,7 @@
 #include "Instance.h"
 
 #define SNES_BIGGEST_WIDTH 512
- 
+
 namespace snes4nacl {
 
 Graphics::Graphics() : opengl(NULL), isFullScreen(false)
@@ -38,16 +38,16 @@ bool Graphics::isInited()
 void Graphics::init()
 {
 	printf("Graphics::init() -- Showing the show");
-	
+
 	if(!opengl)
 		opengl = new OpenGL();
 	opengl->start();
 	opengl->setupScene(GL_RGB, GL_UNSIGNED_SHORT_5_6_5, SNES_BIGGEST_WIDTH);
-	
+
 	GFX.Pitch = 512;
     GFX.Screen = new uint16_t[1024 * 239];
     memset(GFX.Screen, 0, 1024 * 478);
-	
+
 	fullScreen = new pp::Fullscreen(Instance::get());
 }
 
