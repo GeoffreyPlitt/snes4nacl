@@ -35,7 +35,6 @@ INCLUDE_PATHS = $(abspath $(dir $(THIS_MAKEFILE)))
 WARNINGS := -Wno-variadic-macros -Wno-long-long -Wall -pedantic -Werror
 CXXFLAGS := -pthread -std=gnu++98 $(WARNINGS) \
 						-I$(NACL_SDK_ROOT)/include \
-						-L$(NACL_SDK_ROOT)/lib/newlib_x86_32/Release
 
 #
 # Compute tool paths
@@ -57,18 +56,22 @@ all: $(PROJECT)_x86_32.nexe $(PROJECT)_x86_64.nexe
 # Define 32 bit compile and link rules for C++ sources
 x86_32_OBJS:=$(patsubst %.cpp,%_32.o,$(CXX_SOURCES))
 $(x86_32_OBJS) : %_32.o : %.cpp $(THIS_MAKE)
-	$(CXX) -I $(INCLUDE_PATHS) -o $@ -c $< -m32 -O0 -g $(CXXFLAGS)
+	$(CXX) -I $(INCLUDE_PATHS) -o $@ -c $< -m32 -O0 -g $(CXXFLAGS) \
+	-L$(NACL_SDK_ROOT)/lib/newlib_x86_32/Release
 
 $(PROJECT)_x86_32.nexe : $(x86_32_OBJS)
-	$(CXX) -I $(INCLUDE_PATHS) -o $@ $^ -m32 -O0 -g $(CXXFLAGS) $(LDFLAGS)
+	$(CXX) -I $(INCLUDE_PATHS) -o $@ $^ -m32 -O0 -g $(CXXFLAGS) $(LDFLAGS) \
+	-L$(NACL_SDK_ROOT)/lib/newlib_x86_32/Release
 
 # Define 64 bit compile and link rules for C++ sources
 x86_64_OBJS:=$(patsubst %.cpp,%_64.o,$(CXX_SOURCES))
 $(x86_64_OBJS) : %_64.o : %.cpp $(THIS_MAKE)
-	$(CXX) -I $(INCLUDE_PATHS) -o $@ -c $< -m64 -O0 -g $(CXXFLAGS)
+	$(CXX) -I $(INCLUDE_PATHS) -o $@ -c $< -m64 -O0 -g $(CXXFLAGS) \
+	-L$(NACL_SDK_ROOT)/lib/newlib_x86_64/Release
 
 $(PROJECT)_x86_64.nexe : $(x86_64_OBJS)
-	$(CXX) -I $(INCLUDE_PATHS) -o $@ $^ -m64 -O0 -g $(CXXFLAGS) $(LDFLAGS)
+	$(CXX) -I $(INCLUDE_PATHS) -o $@ $^ -m64 -O0 -g $(CXXFLAGS) $(LDFLAGS) \
+	-L$(NACL_SDK_ROOT)/lib/newlib_x86_64/Release
 
 
 # Define a phony rule so it always runs, to build nexe and start up server.
