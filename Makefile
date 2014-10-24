@@ -35,7 +35,7 @@ INCLUDE_PATHS = $(abspath $(dir $(THIS_MAKEFILE)))
 WARNINGS := -Wno-variadic-macros -Wno-long-long -Wall -pedantic -Werror
 CXXFLAGS := -pthread -std=gnu++98 $(WARNINGS) \
 						-I$(NACL_SDK_ROOT)/include \
-						-L$(NACL_SDK_ROOT)/lib/newlib_x86_64/Release
+						-L$(NACL_SDK_ROOT)/lib/newlib_x86_32/Release
 
 #
 # Compute tool paths
@@ -77,5 +77,5 @@ RUN: all
 	python httpd.py
 
 clean:
-	rm $(x86_32_OBJS)
-	rm $(x86_64_OBJS)
+	@rm -f $(x86_32_OBJS)
+	@rm -f $(x86_64_OBJS)
