@@ -11,7 +11,7 @@ vagrant up
 vagrant ssh
 ```
 - Compile
-```
+```bash
 make
 ```
 - You will now have **snes4nacl_x86_32.exe** and **snes4nacl_x86_64.exe** in the root folder.
@@ -19,7 +19,14 @@ make
 Play
 ----
 - Run the local server.
-```
+```bash
 make serve
 ```
 - Navigate to http://localhost:8080.
+
+Distribute
+------
+- Package the zip
+```bash
+make package
+```

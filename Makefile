@@ -85,3 +85,6 @@ clean:
 
 serve:
 	python -m SimpleHTTPServer 8080
+
+package:
+	zip package.zip *.nexe
