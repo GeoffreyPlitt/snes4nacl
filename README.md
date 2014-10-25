@@ -24,9 +24,10 @@ make serve
 ```
 - Navigate to http://localhost:8080.
 
-Distribute
+Package
 ------
-- Package the zip
+- Generate the archive file.
 ```bash
 make package
 ```
+- You now have the \*.nexe files in **package.tar.gz**.

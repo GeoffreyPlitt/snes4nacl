@@ -87,4 +87,4 @@ serve:
 	python -m SimpleHTTPServer 8080
 
 package:
-	zip package.zip *.nexe
+	tar zcvf package.tar.gz *.nexe

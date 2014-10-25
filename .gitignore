@@ -1,4 +1,4 @@
 *.o
 .vagrant/
 *.nexe
-package.zip
+package.tar.gz
